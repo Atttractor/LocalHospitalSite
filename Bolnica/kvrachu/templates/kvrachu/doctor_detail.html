@@ -5,7 +5,7 @@
 Я ТАКИХ КОСТЫЛЕЙ ЕЩЁ НИКОГДА НЕ ПИСАЛ БОЖЕ
 КРОВЬ ИЗ ГЛАЗ-->
   <div>
-    <h2>Имя: {{ doctor.FIO }}</h2>
+    <h2>Имя: {{ doctor.user_is_doctor.first_name }} {{ doctor.user_is_doctor.last_name }}</h2>
     <div class="time_table">
       {% for day in dates %}
       <div class="day"><hr>
@@ -14,37 +14,57 @@
         {% if day.0 == 'Понедельник' %}
           <h3>{{ time_table.monday }}</h3>
             {% if time_table.monday != 'Не работает' %}
-              <button>Записаться</button>
+              <form action="{% url 'doctor' doctor.pk %}" name="form">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+              </form>
             {% endif %}
         {% elif day.0 == 'Вторник' %}
           <h3>{{ time_table.tuesday }}</h3>
             {% if time_table.tuesday != 'Не работает' %}
-              <button>Записаться</button>
+              <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+              </form>
             {% endif %}
         {% elif day.0 == 'Среда' %}
           <h3>{{ time_table.wednesday }}</h3>
             {% if time_table.wednesday != 'Не работает' %}
-              <button>Записаться</button>
+              <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button></form>
             {% endif %}
         {% elif day.0 == 'Четверг' %}
           <h3>{{ time_table.thursday }}</h3>
             {% if time_table.thursday != 'Не работает' %}
-              <button>Записаться</button>
+              <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+              </form>
             {% endif %}
         {% elif day.0 == 'Пятница' %}
           <h3>{{ time_table.friday }}</h3>
             {% if time_table.friday != 'Не работает' %}
-              <button>Записаться</button>
+              <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+              </form>
             {% endif %}
         {% elif day.0 == 'Суббота' %}
           <h3>{{ time_table.saturday }}</h3>
           {% if time_table.saturday != 'Не работает' %}
-            <button>Записаться</button>
+            <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+            </form>
           {% endif %}
         {% elif day.0 == 'Воскресенье' %}
           <h3>{{ time_table.sunday }}</h3>
           {% if time_table.sunday != 'Не работает' %}
-            <button>Записаться</button>
+            <form action="{% url 'doctor' doctor.pk %}">
+                {% csrf_token %}
+                <button type="submit" formmethod="post" name="{{day.1|date:'d.m.Y'}}">Записаться</button>
+            </form>
           {% endif %}
         {% endif %}
       </div>

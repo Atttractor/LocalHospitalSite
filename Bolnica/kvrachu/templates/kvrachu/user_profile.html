@@ -1,11 +1,29 @@
 {% extends "base.html" %}
-{% block title %} <title>Профиль</title> {% endblock %}
+{% block title %} <title>{{ title }}</title> {% endblock %}
 {% block content %}
 <form method="post">
   <div class="container">
+    <h1>User info</h1>
     <h1>{{ user.username }}</h1>
     <h1>{{ user.first_name }}</h1>
     <h1>{{ user.last_name }}</h1>
+    {% if user.doctor %}
+      <hr>
+      <h1>Doctor info</h1>
+      {{user.doctor.speciality_name}} |
+      {{user.doctor.hospital_id}} |
+      {{user.doctor.time_table_id}}
+    {% elif user.patient %}
+      <hr>
+      <h1>Patien info</h1>
+      {{user.patient}}
+      {% for i in zapisi %}
+        {{i}}
+      {% endfor %}
+      {% for i in karta_bolezni %}
+        {{i}}
+      {% endfor %}
+    {% endif %}
   </div>
 </form>
 {% endblock %}

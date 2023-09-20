@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %} <title>Специальности врачей</title> {% endblock %}
+{% block content %}
+<div class="grid">
+  <form action="{% url 'test' %}">
+    {% csrf_token %}
+    <button class="registerbtn" type="submit" formmethod="post">Тестовая кнопка</button>
+  </form>
+</div>
+{% endblock %}

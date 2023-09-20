@@ -1,6 +1,9 @@
+import datetime
+
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -34,8 +37,7 @@ class DoctorDetailView(generic.DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        date_now = d.date(d.now())
+        date_now = d.date(d.now() + timedelta(1))
         days_of_week = ['Понедельник',
                         'Вторник',
                         'Среда',
@@ -55,6 +57,32 @@ class DoctorDetailView(generic.DetailView):
         context['time_table'] = f
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        day = list(dict(request.POST).keys())[-1]
+        date = datetime.datetime.strptime(day, '%d.%m.%Y').date()
+        doctor = Doctor.objects.get(pk=kwargs['pk'])
+
+        patient = Patient.objects.filter(user_is_patient=user)
+        if patient:
+            patient = user.patient
+        else:
+            patient = Patient(user_is_patient=user)
+            Patient.doctor_has_patient = doctor
+            patient.save()
+
+        zapis = Zapis.objects.get_or_create(patient=patient,
+                                            doctor=doctor,
+                                            date=date)
+
+        message = 'Вы успешно записались к врачу'
+        if not zapis[1]:
+            message = 'Ты уже записан к этому врачу на этот день'
+        output = "\033[31m{}\033[0m".format(f'{message}')
+        print(output)
+
+        return HttpResponseRedirect('success')
 
 
 class DoctorHasSpecialityListlView(generic.ListView):
@@ -101,8 +129,37 @@ def logout_user(request):
     return redirect('login')
 
 
-def profile(request):
+class UserProfile(generic.TemplateView):
+    template_name = 'kvrachu/user_profile.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Личный кабинет'
+        patient = Patient.objects.filter(user_is_patient=self.request.user)
+
+        if patient:
+            output = "\033[31m{}\033[0m".format(f'{self.request.user.patient}')
+            print(output)
+            karta_bolezni = KartaBolezni.objects.filter(patient=self.request.user.patient)
+            zapisi = Zapis.objects.filter(patient=self.request.user.patient)
+            context['zapisi'] = zapisi
+            context['karta_bolezni'] = karta_bolezni
+
+        return context
+
+
+def test(request):
+    if request.method == 'POST':
+        print('post')
+
     return render(
         request,
-        'kvrachu/user_profile.html'
+        'kvrachu/test.html',
+    )
+
+
+def success(request):
+    return render(
+        request,
+        'kvrachu/success.html',
     )

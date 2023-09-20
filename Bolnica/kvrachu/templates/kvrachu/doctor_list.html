@@ -4,7 +4,7 @@
 <h1 class="title">{{ title }}</h1>
 <ul class="rectangle">
 {% for doctor in doctor_list %}
-  <li><a href="{% url 'doctor' doctor.pk %}">{{ doctor.FIO }}</a></li>
+  <li><a href="{% url 'doctor' doctor.pk %}">{{ doctor.user_is_doctor.first_name }} {{ doctor.user_is_doctor.last_name }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}
