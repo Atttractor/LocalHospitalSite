@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %} <title>Специальности врачей</title> {% endblock %}
+{% block content %}
+<div class="grid">
+    {% for speciality in speciality_list %}
+      <a href="{% url 'doctorHasSpeciality' speciality.name %}" class="cell"><div>{{ speciality.name }}</div></a>
+    {% endfor %}
+</div>
+{% endblock %}

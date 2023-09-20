@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %} <title>Профиль</title> {% endblock %}
+{% block content %}
+<form method="post">
+  <div class="container">
+    <h1>{{ user.username }}</h1>
+    <h1>{{ user.first_name }}</h1>
+    <h1>{{ user.last_name }}</h1>
+  </div>
+</form>
+{% endblock %}

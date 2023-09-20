@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %} <title>{{ title }}</title> {% endblock %}
+{% block content %}
+<h1 class="title">{{ title }}</h1>
+<ul class="rectangle">
+{% for doctor in doctor_list %}
+  <li><a href="{% url 'doctor' doctor.pk %}">{{ doctor.FIO }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
