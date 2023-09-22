@@ -136,14 +136,19 @@ class UserProfile(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Личный кабинет'
         patient = Patient.objects.filter(user_is_patient=self.request.user)
+        doctor = Doctor.objects.filter(user_is_patient=self.request.user)
 
         if patient:
-            output = "\033[31m{}\033[0m".format(f'{self.request.user.patient}')
-            print(output)
             karta_bolezni = KartaBolezni.objects.filter(patient=self.request.user.patient)
             zapisi = Zapis.objects.filter(patient=self.request.user.patient)
             context['zapisi'] = zapisi
             context['karta_bolezni'] = karta_bolezni
+        elif doctor:
+            karta_bolezni = KartaBolezni.objects.filter(patient=self.request.user.patient)
+            zapisi = Zapis.objects.filter(patient=self.request.user.doctor)
+            patietns = Patient.objects.filter(doctor_has_patient=doctor)
+            context['zapisi'] = zapisi
+            context['patietns'] = karta_bolezni
 
         return context
 
@@ -163,3 +168,11 @@ def success(request):
         request,
         'kvrachu/success.html',
     )
+
+
+"""
+Сейчас тебе осталось проверить как работает личный кабиент врача и если он работает нормально, то сделать отображение
+записанных пользователей по дням недели, а так же добавить возможность редактирования карты болезни.
+И сделать вёрстку страницы записи к врачу, страницы отображения успешности записи и личного кабинета.
+Удачи друг :)
+"""

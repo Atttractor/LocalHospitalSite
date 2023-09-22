@@ -13,10 +13,17 @@
       {{user.doctor.speciality_name}} |
       {{user.doctor.hospital_id}} |
       {{user.doctor.time_table_id}}
+      {% for i in zapisi %}
+        {{i}}
+      {% endfor %}
+      {% for i in patietns %}
+        {{i}}
+      {% endfor %}
     {% elif user.patient %}
       <hr>
       <h1>Patien info</h1>
       {{user.patient}}
+      {{karta_bolezni}}
       {% for i in zapisi %}
         {{i}}
       {% endfor %}
