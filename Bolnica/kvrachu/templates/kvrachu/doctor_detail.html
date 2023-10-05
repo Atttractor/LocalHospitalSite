@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% block title %} <title>{{ doctor.name }}</title> {% endblock %}
 {% block content %}
-<!--ЭТО БЛЯ ПРОСТО КАКОЙ-ТО ПИЗДЕЦ
-Я ТАКИХ КОСТЫЛЕЙ ЕЩЁ НИКОГДА НЕ ПИСАЛ БОЖЕ
-КРОВЬ ИЗ ГЛАЗ-->
   <div>
     <h2>Имя: {{ doctor.user_is_doctor.first_name }} {{ doctor.user_is_doctor.last_name }}</h2>
     <div class="time_table">

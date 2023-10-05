@@ -48,9 +48,9 @@ class Patient(models.Model):
 
 class KartaBolezni(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, help_text='Уникальный идентификатор')
-    bolezn = models.CharField(max_length=45, help_text='Название больницы')
-    desription = models.TextField(help_text='Описание болезни')
-    patient = models.ForeignKey(Patient, on_delete=models.PROTECT, help_text='Пациент')
+    bolezn = models.CharField(max_length=45, help_text='Название болезни')
+    desription = models.TextField(help_text='Описание болезни', default='Описание')
+    patient = models.ForeignKey(Patient, on_delete=models.PROTECT, help_text='Пациент', related_name='kartabolezni')
 
     def __str__(self):
         return self.bolezn

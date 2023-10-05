@@ -12,6 +12,9 @@ urlpatterns = [
     path('register/', RegisterUser.as_view(), name='register'),
     path('logout/', logout_user, name='logout'),
     path('profile/', UserProfile.as_view(), name='profile'),
-    path('test', test, name='test'),
-    path('doctors/success', success, name='success')
+    path('bolezn-info/<uuid:pk>', BoleznInfo.as_view(), name='bolezn_info'),
+    path('doctors/success', success, name='success'),
+    path('add-karta-bolezni/<uuid:pk>', KartaBolezniCreate.as_view(), name='karta_bolezni_add'),
+    path('karta-bolezni/<uuid:pk>', KartaBolezniDetail.as_view(), name='karta_bolezni_detail'),
+    path('patient-karta-bolezni/<uuid:pk>', KartaBolezniList.as_view(), name='karta_bolezni')
 ]

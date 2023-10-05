@@ -1,5 +1,4 @@
 import datetime
-
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
@@ -7,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from .forms import RegisterUserForm
+from .forms import RegisterUserForm, KartaBolezniForm
 from .models import *
 from datetime import datetime as d
 from datetime import timedelta
@@ -67,10 +66,16 @@ class DoctorDetailView(generic.DetailView):
         patient = Patient.objects.filter(user_is_patient=user)
         if patient:
             patient = user.patient
+            patient.doctor_has_patient.add(doctor)
+            patient.save()
         else:
             patient = Patient(user_is_patient=user)
-            Patient.doctor_has_patient = doctor
             patient.save()
+            patient.doctor_has_patient.add(doctor)
+            patient.save()
+
+        karta_bolezni = KartaBolezni(patient=patient, bolezn='Пустая карта')
+        karta_bolezni.save()
 
         zapis = Zapis.objects.get_or_create(patient=patient,
                                             doctor=doctor,
@@ -136,31 +141,86 @@ class UserProfile(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Личный кабинет'
         patient = Patient.objects.filter(user_is_patient=self.request.user)
-        doctor = Doctor.objects.filter(user_is_patient=self.request.user)
+        doctor = Doctor.objects.filter(user_is_doctor=self.request.user)
 
         if patient:
             karta_bolezni = KartaBolezni.objects.filter(patient=self.request.user.patient)
-            zapisi = Zapis.objects.filter(patient=self.request.user.patient)
-            context['zapisi'] = zapisi
+            zapisi_p = Zapis.objects.filter(patient=self.request.user.patient)
+            context['zapisi_p'] = zapisi_p
             context['karta_bolezni'] = karta_bolezni
-        elif doctor:
-            karta_bolezni = KartaBolezni.objects.filter(patient=self.request.user.patient)
-            zapisi = Zapis.objects.filter(patient=self.request.user.doctor)
-            patietns = Patient.objects.filter(doctor_has_patient=doctor)
-            context['zapisi'] = zapisi
-            context['patietns'] = karta_bolezni
+        if doctor:
+            zapisi_d = Zapis.objects.filter(doctor=self.request.user.doctor).order_by('date')
+            patients = Patient.objects.filter(doctor_has_patient=self.request.user.doctor)
+            context['zapisi_d'] = zapisi_d
+            context['patietns'] = patients
 
         return context
 
 
-def test(request):
-    if request.method == 'POST':
-        print('post')
+class KartaBolezniList(generic.ListView):
+    model = KartaBolezni
+    template_name = 'kvrachu/karta_bolezni_list.html'
 
-    return render(
-        request,
-        'kvrachu/test.html',
-    )
+    def get_queryset(self):
+        object_list = KartaBolezni.objects.filter(patient=self.kwargs['pk'])
+        return object_list
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Карты болезни'
+        context['patient_pk'] = self.kwargs['pk']
+        return context
+
+
+class KartaBolezniDetail(generic.DetailView):
+    model = KartaBolezni
+    template_name = 'kvrachu/karta_bolezni_detail.html'
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Карта болезни'
+        context['form'] = KartaBolezniForm
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = KartaBolezniForm(request.POST)
+        if form.is_valid():
+            bolezn, desription = form.cleaned_data.get('bolezn'), form.cleaned_data.get('desription')
+            karta = KartaBolezni.objects.get(pk=kwargs['pk'])
+            karta.bolezn = bolezn
+            karta.desription = desription
+            karta.save()
+        return redirect('home')
+
+
+class KartaBolezniCreate(generic.CreateView):
+    form_class = KartaBolezniForm
+    template_name = 'kvrachu/karta_bolezni_detail.html'
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление карты'
+        context['new_karta_for_patient'] = Patient.objects.get(pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form):
+        patient = Patient.objects.get(pk=self.kwargs['pk'])
+        bolezn, desription = form.cleaned_data.get('bolezn'), form.cleaned_data.get('desription')
+        karta = KartaBolezni(patient=patient, bolezn=bolezn, desription=desription)
+        karta.save()
+        return redirect('home')
+
+
+class BoleznInfo(generic.DetailView):
+    model = KartaBolezni
+    template_name = 'kvrachu/bolezn_info.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Карта болезни'
+        return context
 
 
 def success(request):
@@ -168,11 +228,3 @@ def success(request):
         request,
         'kvrachu/success.html',
     )
-
-
-"""
-Сейчас тебе осталось проверить как работает личный кабиент врача и если он работает нормально, то сделать отображение
-записанных пользователей по дням недели, а так же добавить возможность редактирования карты болезни.
-И сделать вёрстку страницы записи к врачу, страницы отображения успешности записи и личного кабинета.
-Удачи друг :)
-"""

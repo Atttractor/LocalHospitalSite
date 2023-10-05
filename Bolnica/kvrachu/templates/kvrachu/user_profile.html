@@ -1,36 +1,51 @@
 {% extends "base.html" %}
 {% block title %} <title>{{ title }}</title> {% endblock %}
 {% block content %}
-<form method="post">
   <div class="container">
-    <h1>User info</h1>
-    <h1>{{ user.username }}</h1>
-    <h1>{{ user.first_name }}</h1>
-    <h1>{{ user.last_name }}</h1>
+    <h1>Информация о пользователе:</h1>
+    <h1>Username: {{ user.username }}</h1>
+    <h1>Имя: {{ user.first_name }}</h1>
+    <h1>Фамилия: {{ user.last_name }}</h1>
     {% if user.doctor %}
       <hr>
-      <h1>Doctor info</h1>
+      <h1>Информация для доктора:</h1>
       {{user.doctor.speciality_name}} |
       {{user.doctor.hospital_id}} |
       {{user.doctor.time_table_id}}
-      {% for i in zapisi %}
-        {{i}}
+      <h2>К вам записаны:</h2>
+      <ol>
+      {% for zapis in zapisi_d %}
+        <li>{{zapis.patient}} записан на {{zapis.date}}</li>
       {% endfor %}
-      {% for i in patietns %}
-        {{i}}
+      </ol>
+      <h2>Ваши пациенты:</h2>
+      <ol>
+      {% for patient in patietns %}
+        <li>
+          <a class="link" href="{% url 'karta_bolezni' patient.pk %}">{{patient}}</a>
+        </li>
       {% endfor %}
+      </ol>
     {% elif user.patient %}
       <hr>
-      <h1>Patien info</h1>
+      <h1>Информация для пациента</h1>
       {{user.patient}}
-      {{karta_bolezni}}
-      {% for i in zapisi %}
-        {{i}}
-      {% endfor %}
-      {% for i in karta_bolezni %}
-        {{i}}
-      {% endfor %}
+      <h2>Записи:</h2>
+      <ol>
+        {% for zapis in zapisi_p %}
+          <li>
+            <a class="link" href="{% url 'doctor' zapis.doctor.pk %}">{{zapis}}</a>
+          </li>
+        {% endfor %}
+      </ol>
+      <h2>Болезни:</h2>
+      <ol>
+        {% for karta in karta_bolezni %}
+          <li>
+            <a class="link" href="{% url 'bolezn_info' karta.pk %}">{{karta}}</a>
+          </li>
+        {% endfor %}
+      </ol>
     {% endif %}
   </div>
-</form>
 {% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %} <title>{{ title }}</title> {% endblock %}
+{% block content %}
+<div class="container">
+  <h1 class="zagolovok">Все карты</h1>
+  <a class="list" href="{% url 'karta_bolezni_add' patient_pk%}">Добавить карту</a>
+  {% for karta_bolezni in kartabolezni_list %}
+    <a class="list" href="{% url 'karta_bolezni_detail' karta_bolezni.pk %}">{{karta_bolezni}}</a>
+  {% endfor %}
+</div>
+{% endblock %}
